@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11.0)
-project(RedBlackTree)
+project(BinarySearchTree)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include_directories(include)
