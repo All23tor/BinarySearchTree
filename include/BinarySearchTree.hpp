@@ -1,21 +1,21 @@
 #include "BinaryTree.hpp"
 #include <algorithm>
 
-template <class Key, class Compare = std::less<Key>> requires std::predicate<Compare, const Key&, const Key&>
+template <class Key, class Compare = std::less<Key>>
+requires std::predicate<Compare, const Key&, const Key&>
 class BinarySearchTree {
 public:
   using Node = BinaryTree<Key>::Node;
   using Iterator = BinaryTree<Key>::InOrderIterator;
   using ReverseIterator = BinaryTree<Key>::ReverseInOrderIterator;
 
-  BinarySearchTree() = default;  
+  BinarySearchTree() = default;
   explicit BinarySearchTree(Compare _comp) : comp(std::move(_comp)) {}
-  BinarySearchTree(BinarySearchTree&& other) noexcept = default; 
+  BinarySearchTree(BinarySearchTree&& other) noexcept = default;
   BinarySearchTree& operator=(BinarySearchTree&& other) noexcept = default;
-  BinarySearchTree(const BinarySearchTree& other) : 
-    comp{other.comp},
-    root{other.root ? std::make_unique<Node>(*other.root) : nullptr} 
-  {}
+  BinarySearchTree(const BinarySearchTree& other) :
+      comp{other.comp},
+      root{other.root ? std::make_unique<Node>(*other.root) : nullptr} {}
   BinarySearchTree& operator=(const BinarySearchTree& other) {
     if (this != &other)
       *this = BinarySearchTree(other);
@@ -25,8 +25,9 @@ public:
   inline void clear() {
     root.reset();
   }
-  
-  template <class Type> requires std::constructible_from<Key, Type>
+
+  template <class Type>
+  requires std::constructible_from<Key, Type>
   std::pair<Iterator, bool> insert(Type&& key) {
     auto current = &root;
     Node* parent = nullptr;
@@ -51,7 +52,8 @@ public:
     while (current) {
       if (!comp(current->key, key) && !comp(key, current->key))
         return Iterator(current);
-      current = comp(key, current->key) ? current->left.get() : current->right.get();
+      current =
+          comp(key, current->key) ? current->left.get() : current->right.get();
     }
 
     return end();
@@ -60,7 +62,7 @@ public:
   Iterator erase(Iterator it) {
     const auto current = it.current;
     const auto succesor = (++it).current;
-    
+
     auto moveIntoCurrent = [this, u = current](std::unique_ptr<Node>& v) {
       if (v)
         v->parent = u->parent;
@@ -100,7 +102,7 @@ public:
     }
     return Iterator{succesor};
   }
-  
+
   Iterator begin() const {
     if (!root)
       return end();
@@ -113,22 +115,6 @@ public:
   /*TO DO*/
   Iterator end() const {
     return Iterator{nullptr};
-  }
-
-  bool checkAllRightHelper(const Node* node, bool left) const {
-    if (!node)
-      return true;
-    if ((node->parent->*(left ? &Node::left : &Node::right)).get() != node)
-      return false;
-    return checkAllRightHelper(node->left.get(), true) && checkAllRightHelper(node->right.get(), false);
-  }
-
-  bool checkAllRight() const {
-    if (!root)
-      return true;
-    if (root->parent)
-      return false;
-    return checkAllRightHelper(root->left.get(), true) && checkAllRightHelper(root->right.get(), false); 
   }
 
 private:

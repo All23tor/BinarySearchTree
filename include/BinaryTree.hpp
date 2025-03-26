@@ -12,22 +12,23 @@ struct BinaryTree {
     Node() = delete;
     Node(Node&&) = default;
     Node& operator=(Node&&) = default;
-    Node(const Node& other, Node* _parent = nullptr): 
-      key{other.key}, parent{_parent},
-      left{other.left ? std::make_unique<Node>(*other.left, this) : nullptr},
-      right{other. right ? std::make_unique<Node>(*other.right, this) : nullptr}
-    {}
+    Node(const Node& other, Node* _parent = nullptr) :
+        key{other.key},
+        parent{_parent},
+        left{other.left ? std::make_unique<Node>(*other.left, this) : nullptr},
+        right{other.right ? std::make_unique<Node>(*other.right, this)
+                          : nullptr} {}
     Node& operator=(const Node& other) {
       if (this != &other)
         *this = Node(other);
       return *this;
     }
 
-    template <class _T> requires std::is_same_v<std::remove_cvref_t<_T>, T>
-    explicit Node(_T&& value, Node* _parent = nullptr):
-      key{std::forward<_T>(value)},
-      parent{_parent}
-    {}
+    template <class _T>
+    requires std::is_same_v<std::remove_cvref_t<_T>, T>
+    explicit Node(_T&& value, Node* _parent = nullptr) :
+        key{std::forward<_T>(value)},
+        parent{_parent} {}
   };
 
   struct InOrderIterator {
@@ -64,15 +65,16 @@ struct BinaryTree {
           current = current->left.get();
         return *this;
       }
-      
+
       bool wasRightChild;
       do {
-        wasRightChild = (current->parent && current == current->parent->right.get());
+        wasRightChild =
+            (current->parent && current == current->parent->right.get());
         current = current->parent;
       } while (wasRightChild);
       return *this;
     }
-    
+
     InOrderIterator operator++(int) {
       InOrderIterator it = *this;
       ++*this;
@@ -86,15 +88,15 @@ struct BinaryTree {
           current = current->right.get();
         return *this;
       }
-      
+
       bool wasLeftChild;
       do {
-        wasLeftChild = (current->parent && current == current->parent->left.get());
+        wasLeftChild =
+            (current->parent && current == current->parent->left.get());
         current = current->parent;
       } while (wasLeftChild);
       return *this;
     }
-
 
     InOrderIterator operator--(int) {
       InOrderIterator it = *this;
@@ -107,4 +109,3 @@ struct BinaryTree {
 
   std::unique_ptr<Node> root;
 };
-
